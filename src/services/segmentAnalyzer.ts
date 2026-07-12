@@ -22,6 +22,13 @@ export function computeSegmentStats(points: TrackPoint[], startKm: number, endKm
 
   const elevations = rangePoints.map((point) => point.ele).filter((ele): ele is number => ele !== undefined);
 
+  const firstEle = rangePoints[0].ele;
+  const lastEle = rangePoints[rangePoints.length - 1].ele;
+  const avgGradientPercent =
+    firstEle !== undefined && lastEle !== undefined && distanceMeters > 0
+      ? ((lastEle - firstEle) / distanceMeters) * 100
+      : undefined;
+
   return {
     distanceMeters,
     elevationGainMeters: elevationStats.positive,
@@ -33,5 +40,6 @@ export function computeSegmentStats(points: TrackPoint[], startKm: number, endKm
     maxHeartRate: calculateMaxHeartRate(rangePoints),
     minElevation: elevations.length > 0 ? Math.min(...elevations) : undefined,
     maxElevation: elevations.length > 0 ? Math.max(...elevations) : undefined,
+    avgGradientPercent,
   };
 }

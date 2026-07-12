@@ -368,6 +368,79 @@ input:focus {
   background: white;
 }
 
+.analysis-section {
+  display: block;
+}
+
+.splits-table-wrapper {
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.splits-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.splits-table th,
+.splits-table td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 8px 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.splits-table th {
+  color: #475569;
+  font-weight: 600;
+}
+
+.split-row--best {
+  border-left: 3px solid #22c55e;
+  background: #f0fdf4;
+}
+
+.split-row--worst {
+  border-left: 3px solid #ef4444;
+  background: #fef2f2;
+}
+
+.split-badge {
+  display: inline-block;
+  margin: 4px 0 12px;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.split-badge--negative {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.split-badge--positive {
+  color: #78350f;
+  background: #fef3c7;
+}
+
+.split-badge--even {
+  color: #334155;
+  background: #e2e8f0;
+}
+
+.split-halves-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.time-loss-title {
+  margin: 20px 0 4px;
+  font-size: 1rem;
+}
+
 @media (max-width: 720px) {
   .app-shell {
     padding: 16px 12px 48px;

@@ -20,16 +20,30 @@ export function calculateDistanceMeters(pointA: TrackPoint, pointB: TrackPoint):
   return EARTH_RADIUS_METERS * c;
 }
 
+/**
+ * Distancia mínima, en metros, para acumular movimiento entre dos puntos.
+ * Un GPS de reloj/móvil tiene un margen de error de ~3-5m (peor bajo arbolado
+ * en trail running); a 1Hz esa deriva se acumula en miles de puntos e infla
+ * la distancia total un 1-2% frente a Strava/Garmin, que aplican un filtro
+ * de ruido equivalente.
+ */
+const GPS_NOISE_THRESHOLD_METERS = 5;
+
 export function calculateDistances(points: TrackPoint[]): TrackPoint[] {
   if (points.length === 0) {
     return [];
   }
 
   let accumulatedDistance = 0;
+  let anchor = points[0];
 
   return points.map((point, index) => {
     if (index > 0) {
-      accumulatedDistance += calculateDistanceMeters(points[index - 1], point);
+      const segmentDistance = calculateDistanceMeters(anchor, point);
+      if (segmentDistance >= GPS_NOISE_THRESHOLD_METERS) {
+        accumulatedDistance += segmentDistance;
+        anchor = point;
+      }
     }
 
     return {

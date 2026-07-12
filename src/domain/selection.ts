@@ -16,4 +16,5 @@ export interface SegmentStats {
   maxHeartRate?: number;
   minElevation?: number;
   maxElevation?: number;
+  avgGradientPercent?: number;
 }

@@ -1,18 +1,24 @@
 import { useMemo, useState } from 'react';
 import { ActivitySummary } from './components/ActivitySummary';
 import { ActivityUploader } from './components/ActivityUploader';
+import { DecouplingChart } from './components/DecouplingChart';
 import { ElevationProfile } from './components/ElevationProfile';
+import { GradientPaceChart } from './components/GradientPaceChart';
 import { MapPreview } from './components/MapPreview';
 import { SegmentsPanel, type SegmentWithStats } from './components/SegmentsPanel';
+import { SplitComparisonCard } from './components/SplitComparisonCard';
+import { SplitsTable } from './components/SplitsTable';
 import type { ActivitySource } from './domain/activity';
 import type { Segment } from './domain/selection';
 import type { TrackPoint } from './domain/trackPoint';
 import { calculateDistances, calculateElevationStats } from './services/distanceCalculator';
-import { hasEnoughElevationData } from './services/elevationProfile';
+import { hasEnoughElevationData, hasPaceData } from './services/elevationProfile';
 import { parseFit } from './services/fitParser';
 import { parseGpx } from './services/gpxParser';
 import { createSegmentId } from './services/idUtils';
+import { computeAerobicDecoupling, computeHalfSplitComparison, findGradientTimeLoss } from './services/raceAnalysis';
 import { computeSegmentStats } from './services/segmentAnalyzer';
+import { buildKmSplits, findSplitHighlights } from './services/splitsAnalyzer';
 import './styles.css';
 
 function clampKm(km: number, totalKm: number): number {
@@ -38,6 +44,13 @@ export default function App() {
       stats: computeSegmentStats(points, segment.aKm, segment.bKm),
     }));
   }, [points, segments]);
+
+  const kmSplits = useMemo(() => buildKmSplits(points), [points]);
+  const splitHighlights = useMemo(() => findSplitHighlights(kmSplits), [kmSplits]);
+  const halfSplitComparison = useMemo(() => computeHalfSplitComparison(points), [points]);
+  const decoupling = useMemo(() => computeAerobicDecoupling(points), [points]);
+  const gradientTimeLosses = useMemo(() => findGradientTimeLoss(kmSplits), [kmSplits]);
+  const paceAvailable = useMemo(() => hasPaceData(points), [points]);
 
   function resetSegments() {
     setSegments([]);
@@ -171,6 +184,17 @@ export default function App() {
           )}
         </div>
       </div>
+
+      {points.length > 1 && (
+        <div className="analysis-section">
+          <SplitsTable splits={kmSplits} highlights={splitHighlights} />
+          {halfSplitComparison && <SplitComparisonCard comparison={halfSplitComparison} />}
+          {decoupling && <DecouplingChart splits={kmSplits} decoupling={decoupling} />}
+          {elevationAvailable && paceAvailable && (
+            <GradientPaceChart splits={kmSplits} timeLosses={gradientTimeLosses} />
+          )}
+        </div>
+      )}
     </main>
   );
 }
